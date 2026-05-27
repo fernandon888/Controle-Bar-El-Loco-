@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Controle de Vinhos · Fernão El Loco</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0A0906;color:#EDE0C4;font-family:Georgia,'Times New Roman',serif;min-height:100vh}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#131109}
+::-webkit-scrollbar-thumb{background:#3D3428;border-radius:3px}
+input:focus,select:focus{outline:none}
+input[type=number]::-webkit-inner-spin-button{opacity:.4}
+.header{border-bottom:1px solid #2C2720;padding:22px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.eyebrow{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;letter-spacing:4px;color:#6B5C48;margin-bottom:6px;text-transform:uppercase}
+h1{font-size:26px;font-weight:300;letter-spacing:.5px}
+h1 em{color:#C9A84C;font-style:italic}
+.hdr-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tabs{border-bottom:1px solid #2C2720;padding:0 32px;display:flex;gap:4px}
+.tab-btn{background:none;border:none;cursor:pointer;padding:10px 22px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;transition:all .25s;border-bottom:2px solid transparent;color:#6B5C48}
+.tab-btn.active{color:#C9A84C;border-bottom-color:#C9A84C}
+.tab-btn:hover:not(.active){color:#9A8060}
+.pane{padding:24px 32px;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.inp{background:#1A1710;border:1px solid #2C2720;color:#EDE0C4;padding:7px 10px;border-radius:5px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:12px;transition:border .2s}
+.inp:focus{border-color:#7A6228;background:#131109}
+select.inp{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B5C48'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.num-inp{background:#1A1710;border:1px solid #2C2720;color:#EDE0C4;padding:5px 6px;border-radius:4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:13px;text-align:center;width:64px}
+.num-inp.hl{background:#1E1A0F;border-color:#7A6228}
+.num-inp:focus{border-color:#C9A84C}
+.btn{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:none;border-radius:5px;padding:9px 20px;transition:all .2s}
+.btn-g{background:#C9A84C;color:#0A0906;font-weight:600}
+.btn-g:hover{background:#DFC060}
+.btn-o{background:transparent;border:1px solid #3A3228;color:#6B5C48}
+.btn-o:hover{border-color:#7A6228;color:#C9A84C}
+.btn-sm{padding:6px 14px}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:10px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;font-weight:500;letter-spacing:1px}
+.lbl{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#6B5C48}
+.toolbar{display:flex;gap:12px;margin-bottom:20px;align-items:center;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 12px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;letter-spacing:2px;color:#6B5C48;font-weight:400;border-bottom:1px solid #2C2720;background:#131109}
+td{padding:8px 12px;border-bottom:1px solid #2C2720}
+.dr:hover td{background:#131109}
+.card{background:#1A1710;border:1px solid #2C2720;border-radius:8px;padding:20px}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px}
+.kpi-card{background:#1A1710;border:1px solid #2C2720;border-radius:8px;padding:18px 20px}
+.kpi-val{font-size:36px;font-weight:300;line-height:1;margin-top:6px}
+.kpi-sub{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:11px;color:#6B5C48;margin-top:4px}
+.gauge-t{height:6px;background:#3D3428;border-radius:3px;overflow:hidden}
+.gauge-f{height:100%;border-radius:3px;transition:width .6s ease}
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px}
+.leg-i{display:flex;align-items:center;gap:7px}
+.dot{width:8px;height:8px;border-radius:50%}
+.dash-r1{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-bottom:18px}
+.dash-r2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.dcol{display:flex;flex-direction:column;gap:14px}
+.bar-t{height:8px;background:#3D3428;border-radius:4px;overflow:hidden;margin-top:5px}
+.bar-f{height:100%;border-radius:4px;transition:width .7s ease}
+.bar-ts{height:6px;background:#3D3428;border-radius:3px;overflow:hidden;margin-top:4px}
+.bar-fs{height:100%;border-radius:3px;transition:width .7s ease}
+.bar-txs{height:4px;background:#3D3428;border-radius:2px;margin-top:3px}
+.bar-fxs{height:100%;border-radius:2px}
+.slist{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto;margin-top:12px}
+.srow{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1px solid #2C2720}
+.par-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+.par-it{background:#1A1710;border:1px solid #2C2720;border-radius:7px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.par-it.hp{border-color:#3A3228}
+.par-inp{width:64px;background:#131109;border:1px solid #2C2720;color:#EDE0C4;padding:6px 8px;border-radius:5px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:600;text-align:center}
+.par-inp.hv{background:#1E1A0F;border-color:#7A6228;color:#C9A84C}
+.par-inp:focus{outline:none;border-color:#C9A84C}
+.wseg{flex:1;height:6px;border-radius:2px;cursor:pointer;transition:background .2s}
+.warn{margin-top:18px;border-radius:8px;padding:14px 18px;display:flex;gap:12px;align-items:center;background:rgba(201,168,76,.06);border:1px solid #7A6228;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#C9A84C}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.dash-r1,.dash-r2{grid-template-columns:1fr}.header{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+
+const SUPA_URL="https://mswsrcwdkadqshvaduff.supabase.co";
+const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zd3NyY3dka2FkcXNodmFkdWZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3OTgxMTIsImV4cCI6MjA5NTM3NDExMn0.g8Rjwz2JC_nFYg7umnzYnr1wAzucndIY_B9yB0MDJ4k";
+
+async function supaFetch(path,opts){
+  opts=opts||{};
+  const headers={"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"};
+  if(opts.headers)Object.assign(headers,opts.headers);
+  const r=await fetch(SUPA_URL+path,{method:opts.method||"GET",headers,body:opts.body||undefined});
+  if(!r.ok){console.error("Supabase error:",await r.text());return null;}
+  const ct=r.headers.get("content-type")||"";
+  return ct.includes("json")?r.json():null;
+}
+
+async function dbLoadPar(restaurante,tipo){
+  const d=await supaFetch("/rest/v1/par_estoque?restaurante=eq."+encodeURIComponent(restaurante)+"&tipo_controle=eq."+encodeURIComponent(tipo)+"&select=item_id,par_value");
+  if(!d)return;
+  // Se veio dado do banco, ele é a fonte de verdade — substitui o cache local
+  if(d.length>0){
+    S.par={};
+    d.forEach(function(r){S.par[r.item_id]=r.par_value;});
+  }
+}
+
+async function dbSavePar(restaurante,tipo,item_id,par_value){
+  await supaFetch("/rest/v1/par_estoque",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates"},body:JSON.stringify({restaurante:restaurante,tipo_controle:tipo,item_id:item_id,par_value:parseInt(par_value)||0})});
+}
+
+function _v(x){
+  // Converte valor do banco para string mostrar no input.
+  // null/undefined => "" (vazio).
+  // 0 => "" (vazio, não polui o input com "0" em todos os campos).
+  // Qualquer outro número => string do número.
+  if(x===null||x===undefined||x==="")return "";
+  if(x===0||x==="0"||x===0.0)return "";
+  return String(x);
+}
+async function dbLoadWeek(restaurante,tipo,week_key){
+  const d=await supaFetch("/rest/v1/lancamentos?restaurante=eq."+encodeURIComponent(restaurante)+"&tipo_controle=eq."+encodeURIComponent(tipo)+"&week_key=eq."+encodeURIComponent(week_key)+"&select=item_id,central,bar,estoque,vendas,chegada");
+  // SEMPRE substitui o cache local pela versão do banco (banco é fonte de verdade)
+  S.weeks[week_key]={};
+  if(!d||!d.length)return;
+  d.forEach(function(r){
+    S.weeks[week_key][r.item_id]={central:_v(r.central),bar:_v(r.bar),estoque:_v(r.estoque),vendas:_v(r.vendas),chegada:_v(r.chegada)};
+  });
+}
+
+async function dbSaveField(restaurante,tipo,week_key,item_id,field,value){
+  setSyncStatus("saving");
+  // Busca o estado MAIS RECENTE no banco antes de salvar (evita sobrescrever
+  // mudanças que outra pessoa fez em outros campos do mesmo item)
+  var remote=await supaFetch("/rest/v1/lancamentos?restaurante=eq."+encodeURIComponent(restaurante)+
+    "&tipo_controle=eq."+encodeURIComponent(tipo)+
+    "&week_key=eq."+encodeURIComponent(week_key)+
+    "&item_id=eq."+encodeURIComponent(item_id)+
+    "&select=central,bar,estoque,vendas,chegada");
+  var base={central:0,bar:0,estoque:0,vendas:0,chegada:0};
+  if(remote&&remote.length){
+    base={central:parseFloat(remote[0].central)||0,bar:parseFloat(remote[0].bar)||0,
+          estoque:parseFloat(remote[0].estoque)||0,vendas:parseFloat(remote[0].vendas)||0,
+          chegada:parseFloat(remote[0].chegada)||0};
+    // Atualiza cache local com valores do banco (para outros campos)
+    if(!S.weeks[week_key])S.weeks[week_key]={};
+    S.weeks[week_key][item_id]={central:_v(remote[0].central),bar:_v(remote[0].bar),
+                                 estoque:_v(remote[0].estoque),vendas:_v(remote[0].vendas),
+                                 chegada:_v(remote[0].chegada)};
+  }
+  var body={restaurante:restaurante,tipo_controle:tipo,week_key:week_key,item_id:item_id,
+    central:base.central,bar:base.bar,estoque:base.estoque,vendas:base.vendas,chegada:base.chegada,
+    updated_at:new Date().toISOString()};
+  body[field]=parseFloat(value)||0;
+  // Atualiza cache local com o valor novo
+  if(S.weeks[week_key]&&S.weeks[week_key][item_id]){
+    S.weeks[week_key][item_id][field]=String(value);
+  }
+  var result=await supaFetch("/rest/v1/lancamentos",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates"},body:JSON.stringify(body)});
+  setSyncStatus("live");
+  return result;
+}
+
+function setSyncStatus(status){
+  // status: "live" | "syncing" | "offline" | "saving"
+  var el=document.getElementById("sync-status");
+  if(!el)return;
+  var cfg={
+    live:{txt:"● Sincronizado",col:"#5BA85B"},
+    syncing:{txt:"◌ Atualizando...",col:"#C9A84C"},
+    saving:{txt:"◌ Salvando...",col:"#C9A84C"},
+    offline:{txt:"⚠ Offline",col:"#C56B5B"}
+  };
+  var c=cfg[status]||cfg.offline;
+  el.textContent=c.txt;
+  el.style.color=c.col;
+}
+
+function setupRealtime(restaurante,tipo){
+  if(window._rtWS){try{window._rtWS.close();}catch(e){}}
+  if(window._pollTimer){clearInterval(window._pollTimer);}
+
+  var wsUrl=SUPA_URL.replace("https://","wss://")+"/realtime/v1/websocket?apikey="+SUPA_KEY+"&vsn=1.0.0";
+  var ws=new WebSocket(wsUrl);
+  window._rtWS=ws;
+  var hb=null;
+  var topic="realtime:public:lancamentos";
+  ws.onopen=function(){
+    setSyncStatus("live");
+    // Subscription do Realtime do Supabase: precisa enviar config com filter
+    ws.send(JSON.stringify({
+      topic:topic,
+      event:"phx_join",
+      payload:{
+        config:{
+          postgres_changes:[
+            {event:"*",schema:"public",table:"lancamentos"},
+            {event:"*",schema:"public",table:"par_estoque"}
+          ]
+        }
+      },
+      ref:"1"
+    }));
+    hb=setInterval(function(){
+      try{ws.send(JSON.stringify({topic:"phoenix",event:"heartbeat",payload:{},ref:"hb"}));}catch(e){}
+    },25000);
+  };
+  ws.onerror=function(){setSyncStatus("offline");};
+  ws.onclose=function(){
+    setSyncStatus("offline");
+    if(hb)clearInterval(hb);
+    setTimeout(function(){setupRealtime(restaurante,tipo);},3000);
+  };
+  ws.onmessage=function(e){
+    try{
+      var msg=JSON.parse(e.data);
+      // Mensagens postgres_changes vêm com event="postgres_changes" e payload.data
+      var data=msg.payload&&(msg.payload.data||msg.payload.record);
+      if(!data)return;
+      var rec=data.record||data;
+      var tbl=data.table||"";
+      if(tbl==="lancamentos"){
+        if(rec&&rec.restaurante===restaurante&&rec.tipo_controle===tipo){
+          if(rec.week_key===S.week){
+            if(!S.weeks[S.week])S.weeks[S.week]={};
+            // Só atualiza se o campo focado não está sendo editado agora
+            var activeId=document.activeElement&&document.activeElement.dataset?document.activeElement.dataset.iid:null;
+            S.weeks[S.week][rec.item_id]={central:_v(rec.central),bar:_v(rec.bar),estoque:_v(rec.estoque),vendas:_v(rec.vendas),chegada:_v(rec.chegada)};
+            if(String(activeId)!==String(rec.item_id)){
+              render();
+            }
+            setSyncStatus("live");
+          }
+        }
+      }else if(tbl==="par_estoque"){
+        if(rec&&rec.restaurante===restaurante&&rec.tipo_controle===tipo){
+          S.par[rec.item_id]=rec.par_value;
+          render();
+          setSyncStatus("live");
+        }
+      }
+    }catch(err){console.warn("rt msg parse",err);}
+  };
+
+  // FALLBACK: polling a cada 10s caso o realtime falhe
+  window._pollTimer=setInterval(function(){
+    pollUpdate(restaurante,tipo);
+  },10000);
+}
+
+async function pollUpdate(restaurante,tipo){
+  // Recarrega silenciosamente a semana atual
+  try{
+    var beforeStr=JSON.stringify(S.weeks[S.week]||{});
+    await dbLoadWeek(restaurante,tipo,S.week);
+    var afterStr=JSON.stringify(S.weeks[S.week]||{});
+    if(beforeStr!==afterStr){
+      // Só re-renderiza se houve mudança e usuário não está editando
+      var active=document.activeElement;
+      var isEditing=active&&(active.tagName==="INPUT"||active.tagName==="TEXTAREA");
+      if(!isEditing){
+        render();
+      }
+    }
+  }catch(e){console.warn("poll fail",e);}
+}
+
+function showLoading(){
+  document.getElementById("root").innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0A0906;flex-direction:column;gap:16px"><div style="width:40px;height:40px;border:3px solid #3D3428;border-top-color:#C9A84C;border-radius:50%;animation:spin 1s linear infinite"></div><span style="font-family:-apple-system,sans-serif;font-size:12px;letter-spacing:2px;color:#6B5C48;text-transform:uppercase">Carregando...</span></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
+}
+
+const RESTAURANTE="FERNAO EL LOCO";const TIPO_CTRL="vinhos";
+const WINES=[
+  // BRANCO
+  {id:1, nome:"Amayan Torrontes",             tipo:"Branco"},
+  {id:2, nome:"Casal Miranda Verde",           tipo:"Branco"},
+  {id:3, nome:"Cordelier Sauvignon Blanc",     tipo:"Branco"},
+  {id:4, nome:"Finca Wayta Chardonnay",        tipo:"Branco"},
+  {id:5, nome:"Milani Pinot Grigio",           tipo:"Branco"},
+  {id:6, nome:"Mirador Sauvignon Blanc",       tipo:"Branco"},
+  {id:7, nome:"Ravasqueira Clássico",          tipo:"Branco"},
+  {id:8, nome:"Ravasqueira Seleção do Ano",    tipo:"Branco"},
+  {id:9, nome:"Thomas Petit Chablis",          tipo:"Branco"},
+  // ESPUMANTE
+  {id:10,nome:"Baron Herve",                   tipo:"Espumante"},
+  {id:11,nome:"Cava Castelfino",               tipo:"Espumante"},
+  {id:12,nome:"Cave Geisse",                   tipo:"Espumante"},
+  {id:13,nome:"Cordelier Prosecco",            tipo:"Espumante"},
+  {id:14,nome:"Chandon",                       tipo:"Espumante"},
+  {id:15,nome:"Chandon Garden",                tipo:"Espumante"},
+  {id:16,nome:"Moet Chandon",                  tipo:"Espumante"},
+  {id:17,nome:"Monte Paschoal",                tipo:"Espumante"},
+  {id:18,nome:"Rio Sol Brut",                  tipo:"Espumante"},
+  {id:19,nome:"Taittinger Brut",               tipo:"Espumante"},
+  {id:20,nome:"Veuve Ambal",                   tipo:"Espumante"},
+  {id:21,nome:"Veuve Clicquot",                tipo:"Espumante"},
+  // FORTIFICADO
+  {id:22,nome:"Ceremony Tawny",                tipo:"Fortificado"},
+  {id:23,nome:"Dow's Tawny",                   tipo:"Fortificado"},
+  {id:24,nome:"Ramos Pinto Ruby",              tipo:"Fortificado"},
+  {id:25,nome:"Taylor's Ruby",                 tipo:"Fortificado"},
+  {id:26,nome:"Taylor's Tawny",                tipo:"Fortificado"},
+  // ROSÉ
+  {id:27,nome:"Perez Cruz Lingal",             tipo:"Rosé"},
+  {id:28,nome:"Vista Calma Malbec Rosé",       tipo:"Rosé"},
+  // TINTO
+  {id:29,nome:"Amayan Malbec",                 tipo:"Tinto"},
+  {id:30,nome:"Milani Chianti",                tipo:"Tinto"},
+  {id:31,nome:"Perez Cruz Cabernet Sauvignon", tipo:"Tinto"},
+  {id:32,nome:"Ravasqueira Seleção do Ano",    tipo:"Tinto"},
+  {id:33,nome:"Tierruca Carmenere",            tipo:"Tinto"},
+  {id:34,nome:"Torre Oria Tempranillo",        tipo:"Tinto"},
+];
+const TIPOS=["Branco","Espumante","Rosé","Tinto","Fortificado"];
+const TC={Branco:"#C9A84C",Espumante:"#4A7CA8",Rosé:"#A86070",Tinto:"#A84040",Fortificado:"#8C5AA8"};
+const SC={ok:"#4E8C5A",alerta:"#C9A84C",critico:"#A84040","sem-par":"#6B5C48"};
+const SL={ok:"OK",alerta:"Alerta",critico:"Crítico","sem-par":"Sem par"};
+const DP={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:0,16:0,17:0,18:0,19:0,20:0,21:0,22:0,23:0,24:0,25:0,26:0,27:0,28:0,29:0,30:0,31:0,32:0,33:0,34:0};
+
+function getMon(d){d=new Date(d);const day=d.getDay();d.setDate(d.getDate()-day+(day===0?-6:1));d.setHours(0,0,0,0);return d;}
+function wkey(d){return getMon(d||new Date()).toISOString().slice(0,10);}
+function fmtW(k,num,all){
+  if(!k)return"";
+  const m=new Date(k+"T12:00:00"),s=new Date(m);s.setDate(s.getDate()+6);
+  const lbl=m.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})+" – "+s.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"});
+  if(!num||!all)return lbl;
+  const i=all.indexOf(k);return(i>=0?"Sem "+(i+1)+" · ":"")+lbl;
+}
+function buildWeeks(){
+  const keys=[],m=getMon(new Date());
+  for(let i=0;i<26;i++){const d=new Date(m);d.setDate(d.getDate()+i*7);keys.push(d.toISOString().slice(0,10));}
+  return keys;
+}
+const AW=buildWeeks();
+
+const KP="wine_par_el",KW="wine_weeks_el";
+function lPar(){try{const s=JSON.parse(localStorage.getItem(KP)||"{}");return Object.keys(s).length?s:Object.assign({},DP);}catch{return Object.assign({},DP);}}
+function lWeeks(){try{return JSON.parse(localStorage.getItem(KW)||"{}");}catch{return{};}}
+
+const S={tab:"lancamento",week:wkey(),ft:"Todos",srch:"",ps:"",pft:"Todos",par:lPar(),weeks:lWeeks()};
+
+function gw(id,f){return(S.weeks[S.week]||{})[id]?.[f]??"";}
+function sw(id,f,v){
+  if(!S.weeks[S.week])S.weeks[S.week]={};
+  if(!S.weeks[S.week][id])S.weeks[S.week][id]={};
+  S.weeks[S.week][id][f]=v;
+  localStorage.setItem(KW,JSON.stringify(S.weeks));
+  dbSaveField(RESTAURANTE,TIPO_CTRL,S.week,id,f,v);
+}
+function gp(id){return parseInt(S.par[id])||0;}
+
+function comp(){
+  return WINES.map(w=>{
+    const e=parseFloat(gw(w.id,"estoque"))||0,v=parseFloat(gw(w.id,"vendas"))||0,c=parseFloat(gw(w.id,"chegada"))||0,p=gp(w.id);
+    const pct=p>0?Math.round((e/p)*100):null;
+    const st=pct===null?"sem-par":pct>=80?"ok":pct>=40?"alerta":"critico";
+    return{...w,e,v,c,p,pct,st};
+  });
+}
+
+// DOM helper
+function el(tag,cls,attrs){
+  const n=document.createElement(tag);
+  if(cls)n.className=cls;
+  if(attrs)for(const[k,v]of Object.entries(attrs)){
+    if(k==="style"&&typeof v==="object")Object.assign(n.style,v);
+    else if(k.startsWith("on"))n.addEventListener(k.slice(2).toLowerCase(),v);
+    else n.setAttribute(k,v);
+  }
+  return n;
+}
+function txt(t){return document.createTextNode(String(t));}
+function ap(parent,...kids){
+  for(const k of kids.flat(2)){if(k!=null&&k!==false)parent.appendChild(typeof k==="string"||typeof k==="number"?txt(k):k);}
+  return parent;
+}
+function bdg(t,color){return ap(el("span","badge",{style:{background:color+"28",color,border:"1px solid "+color+"55"}}),t);}
+function gauge(pct,color){
+  const t=el("div","gauge-t");
+  ap(t,ap(el("div","gauge-f",{style:{width:Math.min(pct,100)+"%",background:pct>100?"#C9A84C":color}})));
+  return t;
+}
+
+// ── Lançamento ──────────────────────────────────────────────────────────────
+function pLancamento(){
+  const cw=comp();
+  const fil=cw.filter(w=>(S.ft==="Todos"||w.tipo===S.ft)&&(S.srch===""||w.nome.toLowerCase().includes(S.srch.toLowerCase())));
+  const pane=el("div","pane");
+
+  // Toolbar
+  const tb=el("div","toolbar");
+  const si=el("input","inp",{type:"text",placeholder:"Buscar rótulo…",value:S.srch,style:{width:"220px"}});
+  si.addEventListener("input",e=>{S.srch=e.target.value;render();});
+  const fw=el("div","",{style:{display:"flex",gap:"6px"}});
+  ["Todos",...TIPOS].forEach(t=>{
+    const b=ap(el("button","btn btn-sm "+(S.ft===t?"btn-g":"btn-o")),t);
+    b.addEventListener("click",()=>{S.ft=t;render();});
+    ap(fw,b);
+  });
+  const inf=ap(el("div","",{style:{marginLeft:"auto",fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"11px",color:"#6B5C48"}}),fil.length+" rótulos · "+fmtW(S.week));
+  ap(tb,si,fw,inf);
+
+  // Table
+  const ow=el("div","",{style:{overflowX:"auto"}});
+  const tbl=el("table");
+  const thead=ap(el("thead"),ap(el("tr"),
+    ...["RÓTULO","TIPO","PAR","ESTOQUE ATUAL","% PAR","VENDAS SEMANA","CHEGADA","STATUS"].map((h,i)=>
+      ap(el("th","",{style:{textAlign:i<=1?"left":"center",width:[220,90,60,120,130,120,110,90][i]+"px"}}),h)
+    )
+  ));
+  ap(tbl,thead);
+  const tbody=el("tbody");
+  fil.forEach((w,i)=>{
+    const tr=el("tr","dr",{style:{background:i%2===0?"transparent":"#131109"}});
+    // Nome
+    ap(tr,ap(el("td","",{style:{fontSize:"15px"}}),w.nome));
+    // Tipo
+    ap(tr,ap(el("td"),bdg(w.tipo,TC[w.tipo])));
+    // Par
+    ap(tr,ap(el("td","",{style:{textAlign:"center",fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"13px",color:w.p>0?"#C9A84C":"#3D3428"}}),w.p>0?String(w.p):"—"));
+    // Estoque
+    const ei=el("input","num-inp hl",{type:"number",min:"0",value:gw(w.id,"estoque")||"",placeholder:"0"});
+    ei.addEventListener("change",e=>{sw(w.id,"estoque",e.target.value);render();});
+    ei.addEventListener("input",e=>{sw(w.id,"estoque",e.target.value);});
+    ap(tr,ap(el("td","",{style:{textAlign:"center"}}),ei));
+    // % par
+    const ptd=el("td","",{style:{minWidth:"130px",padding:"8px 12px"}});
+    if(w.p>0){
+      const c=w.pct>=80?"#4E8C5A":w.pct>=40?"#C9A84C":"#A84040";
+      ap(ptd,
+        ap(el("div","",{style:{display:"flex",justifyContent:"space-between",marginBottom:"4px"}}),
+          ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"10px",color:c}}),w.pct+"%"),
+          ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"10px",color:"#6B5C48"}}),w.e+"/"+w.p)
+        ),
+        gauge(w.pct,c)
+      );
+    } else {
+      ap(ptd,ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"10px",color:"#3D3428"}}),"Definir par →"));
+    }
+    ap(tr,ptd);
+    // Vendas
+    const vi=el("input","num-inp",{type:"number",min:"0",value:gw(w.id,"vendas")||"",placeholder:"0"});
+    vi.addEventListener("change",e=>{sw(w.id,"vendas",e.target.value);render();});
+    vi.addEventListener("input",e=>{sw(w.id,"vendas",e.target.value);});
+    ap(tr,ap(el("td","",{style:{textAlign:"center"}}),vi));
+    // Chegada
+    const ci=el("input","num-inp",{type:"number",min:"0",value:gw(w.id,"chegada")||"",placeholder:"0"});
+    ci.addEventListener("change",e=>{sw(w.id,"chegada",e.target.value);render();});
+    ci.addEventListener("input",e=>{sw(w.id,"chegada",e.target.value);});
+    ap(tr,ap(el("td","",{style:{textAlign:"center"}}),ci));
+    // Status
+    ap(tr,ap(el("td","",{style:{textAlign:"center"}}),bdg(SL[w.st],SC[w.st])));
+    ap(tbody,tr);
+  });
+  ap(tbl,tbody);
+  ap(ow,tbl);
+
+  // Legend
+  const leg=el("div","legend");
+  [["ok","#4E8C5A","≥ 80% do par"],["alerta","#C9A84C","40–79%"],["critico","#A84040","< 40%"],["sem-par","#6B5C48","Par não definido"]].forEach(([s,c,d])=>{
+    ap(leg,ap(el("div","leg-i"),
+      ap(el("div","dot",{style:{background:c}})),
+      ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"10px",color:c}}),SL[s]),
+      ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"10px",color:"#3D3428"}}),d)
+    ));
+  });
+  return ap(pane,tb,ow,leg);
+}
+
+// ── Dashboard ──────────────────────────────────────────────────────────────
+function pDashboard(){
+  const cw=comp();
+  const tv=cw.reduce((s,w)=>s+w.v,0),tc=cw.reduce((s,w)=>s+w.c,0);
+  const crit=cw.filter(w=>w.st==="critico"),alrt=cw.filter(w=>w.st==="alerta"),sp=cw.filter(w=>w.st==="sem-par");
+  const wp=cw.filter(w=>w.p>0);
+  const avg=wp.length?Math.round(wp.reduce((s,w)=>s+(w.pct||0),0)/wp.length):0;
+  const top=[...cw].filter(w=>w.v>0).sort((a,b)=>b.v-a.v).slice(0,8);
+  const vbt=TIPOS.map(t=>({t,tot:cw.filter(w=>w.tipo===t).reduce((s,w)=>s+w.v,0),c:TC[t]})).filter(x=>x.tot>0).sort((a,b)=>b.tot-a.tot);
+  const mx=Math.max(...vbt.map(x=>x.tot),1);
+
+  const pane=el("div","pane");
+
+  // Progress bar
+  const filled=AW.filter(k=>S.weeks[k]&&Object.values(S.weeks[k]).some(v=>Object.values(v).some(x=>parseFloat(x)>0))).length;
+  const ci=AW.indexOf(S.week);
+  const pg=el("div","",{style:{marginBottom:"20px"}});
+  ap(pg,
+    ap(el("div","",{style:{display:"flex",justifyContent:"space-between",marginBottom:"6px"}}),
+      ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"10px",color:"#6B5C48",letterSpacing:"2px",textTransform:"uppercase"}}),(ci>=0?"Semana "+(ci+1)+" de 26":"Semana")+" · "+fmtW(S.week)),
+      ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"10px",color:"#C9A84C"}}),filled+" semana"+(filled!==1?"s":"")+" preenchida"+(filled!==1?"s":""))
+    )
+  );
+  const segs=el("div","",{style:{display:"flex",gap:"2px"}});
+  AW.forEach(k=>{
+    const hd=S.weeks[k]&&Object.values(S.weeks[k]).some(v=>Object.values(v).some(x=>parseFloat(x)>0));
+    const ic=k===S.week;
+    const seg=el("div","wseg",{title:fmtW(k,true,AW),style:{background:ic?"#C9A84C":hd?"#4E8C5A":"#3D3428",outline:ic?"2px solid #C9A84C":"none",outlineOffset:"1px"}});
+    seg.addEventListener("click",()=>{S.week=k;render();});
+    ap(segs,seg);
+  });
+  ap(pg,segs);
+
+  // KPIs
+  const ac=avg>=80?"#4E8C5A":avg>=40?"#C9A84C":"#A84040";
+  function kpi(lbl,val,sub,c){
+    return ap(el("div","kpi-card"),
+      ap(el("span","lbl"),lbl),
+      ap(el("div","kpi-val",{style:{color:c||"#C9A84C"}}),val),
+      sub?ap(el("div","kpi-sub"),sub):null
+    );
+  }
+  const kg=ap(el("div","kpi-grid"),
+    kpi("Média Estoque vs Par",avg+"%",wp.length+" rótulos com par",ac),
+    kpi("Total Vendido",tv,"garrafas na semana","#C9A84C"),
+    kpi("Chegada de Mercadoria",tc,"garrafas recebidas","#4A7CA8"),
+    kpi("Críticos (< 40%)",crit.length,"rótulos abaixo do mínimo","#A84040"),
+    kpi("Em Alerta (40–79%)",alrt.length,"rótulos atenção","#C9A84C")
+  );
+
+  // Row 1
+  const ce=el("div","card");
+  ap(ce,ap(el("span","lbl"),"Estoque % vs Par · Por Tipo"));
+  const el1=el("div","",{style:{marginTop:"16px",display:"flex",flexDirection:"column",gap:"14px"}});
+  TIPOS.forEach(tipo=>{
+    const ws=cw.filter(w=>w.tipo===tipo&&w.p>0);if(!ws.length)return;
+    const pct=Math.round(ws.reduce((s,w)=>s+(w.pct||0),0)/ws.length);
+    const c=pct>=80?"#4E8C5A":pct>=40?"#C9A84C":"#A84040";
+    const row=el("div");
+    ap(row,ap(el("div","",{style:{display:"flex",justifyContent:"space-between",marginBottom:"5px"}}),
+      ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"11px",color:TC[tipo]}}),tipo),
+      ap(el("div","",{style:{display:"flex",gap:"12px",alignItems:"center"}}),
+        ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"10px",color:"#6B5C48"}}),ws.length+" rótulos"),
+        ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"13px",fontWeight:"600",color:c}}),pct+"%")
+      )
+    ));
+    const bt=el("div","bar-t");ap(bt,ap(el("div","bar-f",{style:{width:Math.min(pct,100)+"%",background:c}})));
+    ap(row,bt);ap(el1,row);
+  });
+  ap(ce,el1);
+
+  const cv=el("div","card");
+  ap(cv,ap(el("span","lbl"),"Vendas da Semana · Por Tipo"));
+  const vl=el("div","",{style:{marginTop:"16px",display:"flex",flexDirection:"column",gap:"12px"}});
+  if(!vbt.length){ap(vl,ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"12px",color:"#3D3428"}}),"Nenhuma venda lançada"));}
+  else{
+    vbt.forEach(({t,tot,c})=>{
+      const row=el("div");
+      ap(row,ap(el("div","",{style:{display:"flex",justifyContent:"space-between",marginBottom:"4px"}}),
+        ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"11px",color:c}}),t),
+        ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"13px",fontWeight:"600",color:c}}),tot+" un")
+      ));
+      const bt=el("div","bar-ts");ap(bt,ap(el("div","bar-fs",{style:{width:Math.round((tot/mx)*100)+"%",background:c}})));
+      ap(row,bt);ap(vl,row);
+    });
+    if(tv>0)ap(vl,ap(el("div","",{style:{marginTop:"8px",paddingTop:"12px",borderTop:"1px solid #2C2720",display:"flex",justifyContent:"space-between"}}),
+      ap(el("span","lbl"),"TOTAL"),
+      ap(el("span","",{style:{fontSize:"20px",color:"#C9A84C"}}),tv+" garrafas")
+    ));
+  }
+  ap(cv,vl);
+  const r1=ap(el("div","dash-r1"),ce,cv);
+
+  // Row 2
+  const ct=el("div","card");
+  ap(ct,ap(el("span","lbl"),"Top Rótulos · Mais Vendidos"));
+  const tl=el("div","",{style:{marginTop:"14px",display:"flex",flexDirection:"column",gap:"10px"}});
+  if(!top.length){ap(tl,ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"12px",color:"#3D3428"}}),"Nenhuma venda lançada"));}
+  else{top.forEach((w,i)=>{
+    const row=ap(el("div","",{style:{display:"flex",alignItems:"center",gap:"10px"}}),
+      ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"10px",color:"#3D3428",width:"18px",textAlign:"right"}}),i+1)
+    );
+    const info=ap(el("div","",{style:{flex:"1"}}),ap(el("div","",{style:{fontSize:"14px",color:"#EDE0C4",marginBottom:"3px"}}),w.nome));
+    const bt=el("div","bar-txs");ap(bt,ap(el("div","bar-fxs",{style:{width:Math.round((w.v/top[0].v)*100)+"%",background:TC[w.tipo]}})));
+    ap(info,bt);ap(row,info,ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"12px",color:TC[w.tipo],fontWeight:"600",width:"32px",textAlign:"right"}}),w.v));
+    ap(tl,row);
+  });}
+  ap(ct,tl);
+
+  const cc=el("div","card",{style:{flex:"1"}});
+  ap(cc,ap(el("div","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"9px",letterSpacing:"3px",textTransform:"uppercase",color:"#A84040"}}),"⚠ Estoque Crítico · Abaixo de 40%"));
+  const cl=el("div","slist");
+  if(!crit.length){ap(cl,ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"12px",color:"#4E8C5A"}}),"✓ Nenhum rótulo crítico"));}
+  else crit.forEach(w=>ap(cl,ap(el("div","srow"),
+    ap(el("div"),ap(el("div","",{style:{fontSize:"14px",color:"#EDE0C4"}}),w.nome),ap(el("div","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"10px",color:"#6B5C48",marginTop:"2px"}}),w.e+" un · par "+w.p)),
+    ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"14px",fontWeight:"700",color:"#A84040"}}),w.pct+"%")
+  )));
+  ap(cc,cl);
+
+  const arr=cw.filter(w=>w.c>0).sort((a,b)=>b.c-a.c);
+  const ca=el("div","card",{style:{flex:"1"}});
+  ap(ca,ap(el("div","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"9px",letterSpacing:"3px",textTransform:"uppercase",color:"#4A7CA8"}}),"↓ Chegada de Mercadoria na Semana"));
+  const al=el("div","slist");
+  if(!arr.length){ap(al,ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"12px",color:"#3D3428"}}),"Nenhuma entrada lançada"));}
+  else arr.forEach(w=>ap(al,ap(el("div","srow"),
+    ap(el("div","",{style:{fontSize:"14px",color:"#EDE0C4"}}),w.nome),
+    ap(el("div","",{style:{display:"flex",alignItems:"center",gap:"8px"}}),bdg(w.tipo,TC[w.tipo]),ap(el("span","",{style:{fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"13px",fontWeight:"600",color:"#4A7CA8"}}),"+"+w.c))
+  )));
+  ap(ca,al);
+
+  const r2=ap(el("div","dash-r2"),ct,ap(el("div","dcol"),cc,ca));
+  ap(pane,pg,kg,r1,r2);
+  if(sp.length>0)ap(pane,ap(el("div","warn"),"⚠ ",ap(el("strong"),sp.length+" rótulos")," sem par definido — configure na aba ",ap(el("em"),"Par de Estoque")," para ver o % no dashboard."));
+  return pane;
+}
+
+// ── Config ──────────────────────────────────────────────────────────────────
+function pConfig(){
+  const pd=Object.values(S.par).filter(v=>parseInt(v)>0).length;
+  const fil=WINES.filter(w=>(S.pft==="Todos"||w.tipo===S.pft)&&(S.ps===""||w.nome.toLowerCase().includes(S.ps.toLowerCase())));
+  const pane=el("div","pane");
+  const tb=el("div","toolbar");
+  const si=el("input","inp",{type:"text",placeholder:"Buscar rótulo…",value:S.ps,style:{width:"220px"}});
+  si.addEventListener("input",e=>{S.ps=e.target.value;render();});
+  const fw=el("div","",{style:{display:"flex",gap:"6px"}});
+  ["Todos",...TIPOS].forEach(t=>{
+    const b=ap(el("button","btn btn-sm "+(S.pft===t?"btn-g":"btn-o")),t);
+    b.addEventListener("click",()=>{S.pft=t;render();});ap(fw,b);
+  });
+  ap(tb,si,fw,ap(el("div","",{style:{marginLeft:"auto",fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"11px",color:"#6B5C48"}}),"Par definido em "+pd+" de "+WINES.length+" rótulos"));
+  const info=ap(el("div","",{style:{background:"rgba(201,168,76,.05)",border:"1px solid #7A6228",borderRadius:"8px",padding:"12px 16px",marginBottom:"20px",fontFamily:"-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif",fontSize:"12px",color:"#C9A84C"}}),"O ",ap(el("strong"),"par de estoque")," é a quantidade ideal que deve existir em estoque para cada rótulo. Os valores são fixos e usados em todas as semanas para calcular o % de cobertura.");
+  const grid=el("div","par-grid");
+  fil.forEach(w=>{
+    const pv=S.par[w.id]??0,hv=parseInt(pv)>0;
+    const item=ap(el("div","par-it"+(hv?" hp":"")),
+      ap(el("div","",{style:{flex:"1"}}),ap(el("div","",{style:{fontSize:"14px",color:"#EDE0C4",marginBottom:"4px"}}),w.nome),bdg(w.tipo,TC[w.tipo]))
+    );
+    const inp=el("input","par-inp"+(hv?" hv":""),{type:"number",min:"0",value:pv||"",placeholder:"0"});
+    inp.addEventListener("change",e=>{S.par[w.id]=e.target.value;localStorage.setItem(KP,JSON.stringify(S.par));dbSavePar(RESTAURANTE,TIPO_CTRL,w.id,e.target.value);render();});
+    inp.addEventListener("input",e=>{
+      S.par[w.id]=e.target.value;localStorage.setItem(KP,JSON.stringify(S.par));
+      const h=parseInt(e.target.value)>0;
+      inp.className="par-inp"+(h?" hv":"");item.className="par-it"+(h?" hp":"");
+    });
+    ap(item,ap(el("div","",{style:{display:"flex",alignItems:"center",gap:"8px"}}),ap(el("span","lbl"),"Par"),inp));
+    ap(grid,item);
+  });
+  return ap(pane,tb,info,grid);
+}
+
+// ── Shell & render ──────────────────────────────────────────────────────────
+function render(){
+  const root=document.getElementById("root");
+  root.innerHTML="";
+  const app=el("div","");
+
+  const wkeys=[...AW,...Object.keys(S.weeks).filter(k=>!AW.includes(k))].sort().reverse();
+  const sel=el("select","inp",{style:{width:"280px"}});
+  wkeys.forEach(k=>{const o=ap(el("option","",{value:k}),fmtW(k,true,AW));if(k===S.week)o.selected=true;ap(sel,o);});
+  sel.addEventListener("change",async function(e){S.week=e.target.value;showLoading();await dbLoadWeek(RESTAURANTE,TIPO_CTRL,S.week);render();});
+  const bActual=ap(el("button","btn btn-g"),"Semana Atual");
+  bActual.addEventListener("click",async function(){S.week=wkey();showLoading();await dbLoadWeek(RESTAURANTE,TIPO_CTRL,S.week);render();});
+
+  ap(app,
+    ap(el("div","header"),
+      ap(el("div"),ap(el("div","eyebrow"),"FERNÃO EL LOCO · GESTÃO DE VINHOS"),ap(el("h1"),txt("Controle "),ap(el("em"),"Semanal"),txt(" de Vinhos"))),
+      ap(el("div","hdr-right"),ap(el("span","lbl"),"Semana"),sel,bActual)
+    )
+  );
+
+  const tabs=el("div","tabs");
+  [["lancamento","Lançamento Semanal"],["dashboard","Dashboard"],["config","⚙ Par de Estoque"]].forEach(([k,lbl])=>{
+    const b=ap(el("button","tab-btn"+(S.tab===k?" active":"")),lbl);
+    b.addEventListener("click",()=>{S.tab=k;render();});
+    ap(tabs,b);
+  });
+  ap(app,tabs);
+
+  if(S.tab==="lancamento")ap(app,pLancamento());
+  else if(S.tab==="dashboard")ap(app,pDashboard());
+  else ap(app,pConfig());
+
+  ap(root,app);
+}
+
+
+// Injeta indicador de sincronização fixo no topo direito
+(function(){
+  var bar=document.createElement("div");
+  bar.id="sync-bar";
+  bar.style.cssText="position:fixed;top:8px;right:8px;z-index:9999;display:flex;gap:8px;align-items:center;background:#1A1710;border:1px solid #2C2720;border-radius:8px;padding:6px 10px;font-family:-apple-system,sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;box-shadow:0 4px 12px rgba(0,0,0,0.3)";
+  bar.innerHTML='<span id="sync-status" style="color:#6B5C48">◌ Conectando...</span><button id="sync-refresh" style="background:transparent;border:1px solid #3D3428;color:#C9A84C;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:10px;letter-spacing:1px">↻ Atualizar</button>';
+  document.body.appendChild(bar);
+  document.getElementById("sync-refresh").addEventListener("click",async function(){
+    setSyncStatus("syncing");
+    await dbLoadPar(RESTAURANTE,TIPO_CTRL);
+    await dbLoadWeek(RESTAURANTE,TIPO_CTRL,S.week);
+    render();
+    setSyncStatus("live");
+  });
+})();
+
+async function init(){
+  showLoading();
+  setSyncStatus("syncing");
+  await dbLoadPar(RESTAURANTE,TIPO_CTRL);
+  await dbLoadWeek(RESTAURANTE,TIPO_CTRL,S.week);
+  render();
+  setupRealtime(RESTAURANTE,TIPO_CTRL);
+  setSyncStatus("live");
+}
+init();
+</script>
+</body>
+</html>
